@@ -13,7 +13,8 @@ sed -ri 's/^(CONFIG_KALLSYMS_ALL=.*|# CONFIG_KALLSYMS_ALL is not set)/CONFIG_KAL
 # isn't kprobes-tolerant you should to disable these features
 sed -ri 's/^(CONFIG_KPROBES=.*|# CONFIG_KPROBES is not set)/CONFIG_KPROBES=y/' $DEFCONFIG
 sed -ri 's/^(CONFIG_HAVE_KPROBES=.*|# CONFIG_HAVE_KPROBES is not set)/CONFIG_HAVE_KPROBES=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_KPROBE_EVENTS=.*|# CONFIG_KPROBE_EVENTS is not set)/CONFIG_KPROBE_EVENTS=y/' $DEFCONFIG
+# sed -ri 's/^(CONFIG_KPROBE_EVENTS=.*|# CONFIG_KPROBE_EVENTS is not set)/CONFIG_KPROBE_EVENTS=y/' $DEFCONFIG
+echo "CONFIG_KPROBE_EVENTS=y" >> $DEFCONFIG
 # uncomment this if any modules does not like kprobes
 # sed -ri 's/^CONFIG_KPROBES=y/# CONFIG_KPROBES is not set/' $DEFCONFIG
 # sed -ri 's/^CONFIG_HAVEKPROBES=y/# CONFIG_HAVE_KPROBES is not set/' $DEFCONFIG
