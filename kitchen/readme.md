@@ -6,13 +6,14 @@ Still rough, but at least it's here
 
 Also this guide is not for begineers.
 
-Traditional way to build kernel
+## Traditional way to build kernel
 
 Kernel base: <https://github.com/Saikrishna1504/kernel_xiaomi_mt6785> `bka` branch
 
 susfs patch base: <https://github.com/TheSillyOk/kernel_ls_patches/blob/master/susfs-1.5.12.patch>
 
 KernelSU scope-minimized hook reference: <https://github.com/backslashxx/KernelSU/issues/5>
+
 Using SukiSU as root implementation.
 
 shallow clone kernel tree
@@ -42,3 +43,16 @@ Run `plant-susfs-defconfig.sh` to add susfs-related entries. Also run `sussifyke
 Run `build.sh` to start building the kernel.
 
 Once done you will get 3 image files (TODO: add `boot.img` support): `Image`, `Image.gz`, `Image.gz-dtb`. Download Anykernel3 from [here](https://github.com/cvnertnc/AnyKernel3/), place `Image.gz-dtb` in Anykernel3 root folder then zip it. After this flash it to your device.
+
+## shallow clone commit
+
+Sometimes latest kernel changes unstable or does not compile correctly, which makes cloning last good commit required. To do this run these commands:
+
+```sh
+git init
+git remote add origin https://github.com/Saikrishna1504/kernel_xiaomi_mt6785
+git fetch --depth 1 origin <commit sha1>
+git checkout FETCH_HEAD
+```
+
+If you are making diff you must create two branch to keep track of changes since this kind of clone is branchless (diffing two commits also possible although it is not convenient).
