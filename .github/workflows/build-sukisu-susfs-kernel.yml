@@ -107,7 +107,7 @@ jobs:
 
           # integrate susfs
           cp -r ../patches/susfs-backport/thesillyok-susfs-1.5.12/fs/* fs/
-          cp -r ../patches/susfs-backport/thesillyok-susfs-1.5.12/fs/* include/linux/
+          cp -r ../patches/susfs-backport/thesillyok-susfs-1.5.12/include/linux/* include/linux/
           patch -p1 < ../patches/susfs-backport/thesillyok-susfs-1.5.12/thesillyok-susfs-1.5.12-mod.patch
 
           (
