@@ -268,7 +268,7 @@ jobs:
           echo "${{ env.SUKISU_COMMIT }}@${{ env.SUKISU_BRANCH }}" >> ${{ env.KERNEL_FOLDER }}/KernelSU/commit.txt
 
       - name: Pack kernel source
-        if : ${{ github.event.inputs.upload_artifact == 'true' }}
+        if : ${{ (github.event.inputs.upload_artifact == 'true') || (github.event.inputs.generate_release != 'none') }}
         run: |
             tar --use-compress-program="pigz -k -9" \
               --exclude=".git"\
