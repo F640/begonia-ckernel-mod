@@ -15,7 +15,7 @@ on:
       generate_release:
         type: choice
         description: Generate release? You will need to enable 2FA after you create release
-        default: none # More info about above: # https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
+        default: none # More info about above: https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
         options:
           - none
           - pre-release
@@ -121,7 +121,7 @@ jobs:
           # temporary fix SukiSU compile issues on susfs-main-branch
           patch -p1 < ../../patches/other-patches/ssu-susfs-main-fix-678c00.patch
           # make SukiSU compatible with backported susfs
-          # patch -p1 < ../../patches/susfs-backport/thesillyok-susfs-1.5.12/thesillyok-susfs-1.5.12-compat.patch
+          # patch -p1 < ../../patches/susfs-backport/thesillyok-susfs-1.5.12/thesillyok-susfs-1.5.12-compat-678c00.patch
           )
 
       - name: Start building (without KPM)

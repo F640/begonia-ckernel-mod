@@ -1,0 +1,240 @@
+diff --git a/kernel/file_wrapper.c b/kernel/file_wrapper.c
+index 432e0645..4856a199 100644
+--- a/kernel/file_wrapper.c
++++ b/kernel/file_wrapper.c
+@@ -279,7 +279,7 @@ static int ksu_wrapper_fadvise(struct file *fp, loff_t off1, loff_t off2, int fl
+ static int ksu_wrapper_clone_file_range(struct file *file_in, loff_t pos_in,
+ 				struct file *file_out, loff_t pos_out, u64 len) {
+ 	// TODO: determine which file to use
+-	struct ksu_file_proxy* data = file_in->private_data;
++	struct ksu_file_wrapper* data = file_in->private_data;
+ 	struct file* orig = data->orig;
+ 	if (orig->f_op->clone_file_range) {
+ 		return orig->f_op->clone_file_range(orig, pos_in, file_out, pos_out, len);
+@@ -290,7 +290,7 @@ static int ksu_wrapper_clone_file_range(struct file *file_in, loff_t pos_in,
+ static ssize_t ksu_wrapper_dedupe_file_range(struct file *src_file, u64 loff,
+ 				u64 len, struct file *dst_file, u64 dst_loff) {
+ 	// TODO: determine which file to use
+-	struct ksu_file_proxy* data = src_file->private_data;
++	struct ksu_file_wrapper* data = src_file->private_data;
+ 	struct file* orig = data->orig;
+ 	if (orig->f_op->dedupe_file_range) {
+ 		return orig->f_op->dedupe_file_range(orig, loff, len, dst_file, dst_loff);
+diff --git a/kernel/kernel_umount.c b/kernel/kernel_umount.c
+index 7dd69461..d4cbdd59 100644
+--- a/kernel/kernel_umount.c
++++ b/kernel/kernel_umount.c
+@@ -1,4 +1,3 @@
+-#include <linux/sched.h>
+ #include <linux/slab.h>
+ #include <linux/task_work.h>
+ #include <linux/version.h>
+@@ -10,6 +9,11 @@
+ #include <linux/path.h>
+ #include <linux/printk.h>
+ #include <linux/types.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++#include <linux/sched/task.h>
++#else
++#include <linux/sched.h>
++#endif
+ 
+ #ifdef CONFIG_KSU_SUSFS
+ #include <linux/susfs.h>
+diff --git a/kernel/ksud.c b/kernel/ksud.c
+index 43c5cc64..2c974167 100644
+--- a/kernel/ksud.c
++++ b/kernel/ksud.c
+@@ -223,7 +223,7 @@ static struct callback_head on_post_fs_data_cb = { .func =
+                                                        on_post_fs_data_cbfun };
+ 
+ // IMPORTANT NOTE: the call from execve_handler_pre WON'T provided correct value for envp and flags in GKI version
+-int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
++int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
+                              struct user_arg_ptr *argv,
+                              struct user_arg_ptr *envp, int *flags)
+ {
+@@ -261,7 +261,11 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
+             const char __user *p = get_user_arg_ptr(*argv, 1);
+             if (p && !IS_ERR(p)) {
+                 char first_arg[16];
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+                 strncpy_from_user_nofault(first_arg, p, sizeof(first_arg));
++#else
++                strncpy_from_user(first_arg, p, sizeof(first_arg));
++#endif
+                 pr_info("/system/bin/init first arg: %s\n", first_arg);
+                 if (!strcmp(first_arg, "second_stage")) {
+                     pr_info("/system/bin/init second_stage executed\n");
+@@ -283,7 +287,12 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
+             const char __user *p = get_user_arg_ptr(*argv, 1);
+             if (p && !IS_ERR(p)) {
+                 char first_arg[16];
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+                 strncpy_from_user_nofault(first_arg, p, sizeof(first_arg));
++#else
++                strncpy_from_user(first_arg, p, sizeof(first_arg));
++#endif
+                 pr_info("/init first arg: %s\n", first_arg);
+                 if (!strcmp(first_arg, "--second-stage")) {
+                     pr_info("/init second_stage executed\n");
+@@ -305,7 +314,11 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
+                     }
+                     char env[256];
+                     // Reading environment variable strings from user space
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+                     if (strncpy_from_user_nofault(env, p, sizeof(env)) < 0)
++#else
++                    if (strncpy_from_user(env, p, sizeof(env)) < 0)
++#endif
+                         continue;
+                     // Parsing environment variable names and values
+                     char *env_name = env;
+@@ -337,7 +350,11 @@ int ksu_handle_execveat_ksud(int *fd, struct filename **filename_ptr,
+         rcu_read_lock();
+         init_task = rcu_dereference(current->real_parent);
+         if (init_task) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+             task_work_add(init_task, &on_post_fs_data_cb, TWA_RESUME);
++#else
++            task_work_add(init_task, &on_post_fs_data_cb, true);
++#endif
+         }
+         rcu_read_unlock();
+ 
+@@ -550,11 +567,15 @@ static int sys_execve_handler_pre(struct kprobe *p, struct pt_regs *regs)
+         return 0;
+ 
+     memset(path, 0, sizeof(path));
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+     strncpy_from_user_nofault(path, *filename_user, 32);
++#else
++    strncpy_from_user(path, *filename_user, 32);
++#endif
+     filename_in.name = path;
+ 
+     filename_p = &filename_in;
+-    return ksu_handle_execveat_ksud(AT_FDCWD, &filename_p, &argv, NULL, NULL);
++    return ksu_handle_execveat(AT_FDCWD, &filename_p, &argv, NULL, NULL);
+ }
+ 
+ static int sys_read_handler_pre(struct kprobe *p, struct pt_regs *regs)
+diff --git a/kernel/selinux/selinux.c b/kernel/selinux/selinux.c
+index 57c2be1b..9096d20f 100644
+--- a/kernel/selinux/selinux.c
++++ b/kernel/selinux/selinux.c
+@@ -116,7 +116,11 @@ bool is_task_ksu_domain(const struct cred* cred)
+     if (!cred) {
+         return false;
+     }
+-    const struct task_security_struct *tsec = selinux_cred(cred);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0)
++     const struct task_security_struct *tsec = selinux_cred(cred);
++#else
++    const struct task_security_struct *tsec = cred->security;
++#endif
+     if (!tsec) {
+         return false;
+     }
+@@ -140,7 +144,11 @@ bool is_zygote(const struct cred* cred)
+     if (!cred) {
+         return false;
+     }
+-    const struct task_security_struct * tsec = selinux_cred(cred);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0)
++     const struct task_security_struct *tsec = selinux_cred(cred);
++#else
++    const struct task_security_struct *tsec = cred->security;
++#endif
+     if (!tsec) {
+         return false;
+     }
+diff --git a/kernel/setuid_hook.c b/kernel/setuid_hook.c
+index a66ac2f8..7fb1b69b 100644
+--- a/kernel/setuid_hook.c
++++ b/kernel/setuid_hook.c
+@@ -438,7 +438,11 @@ int ksu_handle_setresuid(uid_t ruid, uid_t euid, uid_t suid)
+             if (!is_ksu_domain()) {
+                 pr_warn("find suspicious EoP: %d %s, from %d to %d\n", 
+                     current->pid, current->comm, old_uid, new_uid);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+                 force_sig(SIGKILL);
++#else
++                force_sig(SIGKILL, current);
++#endif
+                 return 0;
+             }
+         }
+@@ -447,7 +451,11 @@ int ksu_handle_setresuid(uid_t ruid, uid_t euid, uid_t suid)
+             if (euid < current_euid().val && !ksu_is_allow_uid_for_current(old_uid)) {
+                 pr_warn("find suspicious EoP: %d %s, from %d to %d\n", 
+                     current->pid, current->comm, old_uid, new_uid);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+                 force_sig(SIGKILL);
++#else
++                force_sig(SIGKILL, current);
++#endif
+                 return 0;
+             }
+         }
+diff --git a/kernel/supercalls.c b/kernel/supercalls.c
+index 78d7f270..97fdcb5d 100644
+--- a/kernel/supercalls.c
++++ b/kernel/supercalls.c
+@@ -401,7 +401,12 @@ static int do_get_wrapper_fd(void __user *arg) {
+     struct file* pf = fget(ret);
+ 
+     struct inode* wrapper_inode = file_inode(pf);
+-    struct inode_security_struct *sec = selinux_inode(wrapper_inode);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0) || defined(KSU_OPTIONAL_SELINUX_INODE)
++     struct inode_security_struct *sec = selinux_inode(wrapper_inode);
++#else
++    struct inode_security_struct *sec =
++        (struct inode_security_struct *)wrapper_inode->i_security;
++#endif
+     if (sec) {
+         sec->sid = ksu_file_sid;
+     }
+diff --git a/kernel/syscall_hook_manager.c b/kernel/syscall_hook_manager.c
+index 9eba26e2..6d24f454 100644
+--- a/kernel/syscall_hook_manager.c
++++ b/kernel/syscall_hook_manager.c
+@@ -208,9 +208,13 @@ static inline bool check_syscall_fastpath(int nr)
+     case __NR_faccessat:
+     case __NR_execve:
+     case __NR_setresuid:
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+     case __NR_faccessat2:
++#endif
+     case __NR_clone:
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0)
+     case __NR_clone3:
++#endif
+         return true;
+     default:
+         return false;
+@@ -227,7 +231,11 @@ int ksu_handle_init_mark_tracker(const char __user **filename_user,
+         return 0;
+     
+     memset(path, 0, sizeof(path));
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+     strncpy_from_user_nofault(path, *filename_user, sizeof(path));
++#else
++	strncpy_from_user(path, *filename_user, sizeof(path));
++#endif
+ 
+     if (likely(strstr(path, "adbd") == NULL)){
+         ksu_clear_task_tracepoint_flag(current);
+@@ -319,7 +327,11 @@ static void ksu_sys_enter_handler(void *data, struct pt_regs *regs, long id)
+ 		}
+ 
+ 		// Handle inode_permission via faccessat
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)
+ 		if (id == __NR_faccessat || id == __NR_faccessat2)
++#else
++		if (id == __NR_faccessat)
++#endif
+         	return ksu_handle_inode_permission(regs);
+ 
+ #ifdef CONFIG_KSU_MANUAL_SU
