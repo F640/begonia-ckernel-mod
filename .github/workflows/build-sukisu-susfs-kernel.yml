@@ -1,7 +1,6 @@
 name: Build SukiSU + susfs Kernel
 run-name: Build da kernel
-# I am aware of GitHub releases, but due to 2FA requirement i am not going to make it. I'm sorry about that, but please understand my choice since i do not take this lightly.
-# https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
+
 on:
   workflow_dispatch:
     inputs:
@@ -13,6 +12,15 @@ on:
         type: boolean
         default: false
         description: Upload built AnyKernel3 folder to artifact
+      generate_release:
+        type: choice
+        description: Generate release? You will need to enable 2FA after you create release
+        default: none # More info about above: # https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
+        options:
+          - none
+          - pre-release
+          - release
+        required: true
 
 permissions:
   contents: write
@@ -277,3 +285,18 @@ jobs:
           if-no-files-found: error
           compression-level: 9
           include-hidden-files: false
+
+      - name: Create release
+        if: ${{ github.event.inputs.generate_release != 'none' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ github.event.inputs.generate_release == 'pre-release' }}
+          tag_name: ${{ env.TAG }}
+          files: |
+            sukisu-begonia-power-kernel-mod.zip
+            sukisu-*-begonia-power-kernel-mod.zip
+            sukisu-begonia-power-kernel-mod-src.zip
+          body: |
+            Power Kernel commit: `${{ env.KERNEL_COMMIT }}`
+            SukiSU commit: `${{ env.SUKISU_COMMIT }}@${{ env.SUKISU_BRANCH }}`
+            susfs version: `1.5.12`
