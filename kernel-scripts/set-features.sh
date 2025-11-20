@@ -3,33 +3,69 @@
 # enable kernel features
 
 set -e
-export DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
+export DEV_DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
+export STOCK_DEFCONFIG="$PWD/arch/arm64/configs/stock_defconfig"
 
-# kernelsu and their kids requirements
-sed -ri 's/^(CONFIG_KALLSYMS=.*|# CONFIG_KALLSYMS is not set)/CONFIG_KALLSYMS=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_KALLSYMS_ALL=.*|# CONFIG_KALLSYMS_ALL is not set)/CONFIG_KALLSYMS_ALL=y/' $DEFCONFIG
+declare -a enable_feature_flags=(
+    # kernelsu and their kids requirements
+    "CONFIG_KALLSYMS" 
+    "CONFIG_KALLSYMS_ALL"
+    # If you plan to build with vanilla kernelsu (or any kernelsu fork) with manual hook that
+    # isn't kprobes-tolerant you should  disable kprobes
+    "CONFIG_KPROBES"
+    "CONFIG_HAVE_KPROBES"
+    # same goes for this one
+    "CONFIG_HAVE_KRETPROBES"
+    # mountify requirements if you need it
+    "CONFIG_OVERLAY_FS"
+    "CONFIG_TMPFS_XATTR"
+    # this might be helpful one day
+    "CONFIG_TMPFS_POSIX_ACL"
+    # lkm support
+    "CONFIG_MODULES"
+    "CONFIG_MODULE_UNLOAD"
+    "CONFIG_MODVERSIONS"
+)
 
-# If you plan to build with vanilla kernelsu (or any kernelsu fork) with manual hook that
-# isn't kprobes-tolerant you should to disable these features
-sed -ri 's/^(CONFIG_KPROBES=.*|# CONFIG_KPROBES is not set)/CONFIG_KPROBES=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_HAVE_KPROBES=.*|# CONFIG_HAVE_KPROBES is not set)/CONFIG_HAVE_KPROBES=y/' $DEFCONFIG
-# sed -ri 's/^(CONFIG_KPROBE_EVENTS=.*|# CONFIG_KPROBE_EVENTS is not set)/CONFIG_KPROBE_EVENTS=y/' $DEFCONFIG
-echo "CONFIG_KPROBE_EVENTS=y" >> $DEFCONFIG
-# uncomment this if any modules does not like kprobes
-# sed -ri 's/^CONFIG_KPROBES=y/# CONFIG_KPROBES is not set/' $DEFCONFIG
-# sed -ri 's/^CONFIG_HAVEKPROBES=y/# CONFIG_HAVE_KPROBES is not set/' $DEFCONFIG
+declare -a add_enable_feature_flags=(
+    # If you plan to build with vanilla kernelsu (or any kernelsu fork) with manual hook that
+    # isn't kprobes-tolerant you should  disable kprobes
+    "CONFIG_KPROBE_EVENTS"
+)
 
-# mountify requirements if you need it
-sed -ri 's/^(CONFIG_OVERLAY_FS=.*|# CONFIG_OVERLAY_FS is not set)/CONFIG_OVERLAY_FS=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_TMPFS_XATTR=.*|# CONFIG_TMPFS_XATTR is not set)/CONFIG_TMPFS_XATTR=y/' $DEFCONFIG
+declare -a disable_feature_flags=(
+)
 
-# maybe helpful one day
-sed -ri 's/^(CONFIG_TMPFS_POSIX_ACL=.*|# CONFIG_TMPFS_POSIX_ACL is not set)/CONFIG_TMPFS_POSIX_ACL=y/' $DEFCONFIG
+declare -a add_disable_feature_flags=(
+)
 
-# LKM support
-sed -ri 's/^(CONFIG_MODULES=.*|# CONFIG_MODULES is not set)/CONFIG_MODULES=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_MODULE_UNLOAD=.*|# CONFIG_MODULE_UNLOAD is not set)/CONFIG_MODULE_UNLOAD=y/' $DEFCONFIG
-sed -ri 's/^(CONFIG_MODVERSIONS=.*|# CONFIG_MODVERSIONS is not set)/CONFIG_MODVERSIONS=y/' $DEFCONFIG
+# enable features logic
+for CONFIG in "${enable_feature_flags[@]}"
+do
+   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/' $DEV_DEFCONFIG
+   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/' $STOCK_DEFCONFIG
+done
+
+# add and enable features logic
+for CONFIG in "${add_enable_feature_flags[@]}"
+do
+   echo "$CONFIG=y" >> $DEV_DEFCONFIG
+   echo "$CONFIG=y" >> $STOCK_DEFCONFIG
+done
+
+# disable features logic
+for CONFIG in "${disable_feature_flags[@]}"
+do
+   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/' $DEV_DEFCONFIG
+   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/' $STOCK_DEFCONFIG
+done
+
+# add and disable features logic
+for CONFIG in "${add_disable_feature_flags[@]}"
+do
+   echo "$CONFIG=n" >> $DEV_DEFCONFIG
+   echo "$CONFIG=n" >> $STOCK_DEFCONFIG
+done
 
 # edit kernel suffix for evade play integrity detection
-sed -ri 's/^(CONFIG_LOCALVERSION=.*|# CONFIG_LOCALVERSION is not set)/CONFIG_LOCALVERSION="-PooWeR"/' $DEFCONFIG
+sed -ri 's/^(CONFIG_LOCALVERSION=.*|# CONFIG_LOCALVERSION is not set)/CONFIG_LOCALVERSION="-PooWeR"/' $DEV_DEFCONFIG
