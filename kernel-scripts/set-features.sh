@@ -42,8 +42,8 @@ declare -a add_disable_feature_flags=(
 # enable features logic
 for CONFIG in "${enable_feature_flags[@]}"
 do
-   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/' $DEV_DEFCONFIG
-   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/' $STOCK_DEFCONFIG
+   sed -ri "s/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/" $DEV_DEFCONFIG
+   sed -ri "s/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=y/" $STOCK_DEFCONFIG
 done
 
 # add and enable features logic
@@ -56,8 +56,8 @@ done
 # disable features logic
 for CONFIG in "${disable_feature_flags[@]}"
 do
-   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/' $DEV_DEFCONFIG
-   sed -ri 's/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/' $STOCK_DEFCONFIG
+   sed -ri "s/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/" $DEV_DEFCONFIG
+   sed -ri "s/^($CONFIG=.*|# $CONFIG is not set)/$CONFIG=n/" $STOCK_DEFCONFIG
 done
 
 # add and disable features logic
