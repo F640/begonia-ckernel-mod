@@ -199,10 +199,10 @@ jobs:
               # integrate KPM and rebuild kernel iamge
               (
               cd out/arch/arm64/boot
-              rm -rf Image.gz-dtb
+              rm -f Image.gz-dtb
               sukisu_kpm_patch
               # oImage is KPM-patched kernel image
-              rm -rf Image Image.gz
+              rm -f Image Image.gz
               mv oImage Image
               gzip -k -6 Image
               cat Image.gz mtk.dtb > Image.gz-dtb
@@ -230,10 +230,10 @@ jobs:
               # integrate KPM and rebuild kernel iamge
               (
               cd out/arch/arm64/boot
-              rm -rf Image.gz-dtb
+              rm -f Image.gz-dtb
               sukisu_kpm_patch
               # oImage is KPM-patched kernel image
-              rm -rf Image Image.gz
+              rm -f Image Image.gz
               mv oImage Image
               gzip -k -6 Image
               cat Image.gz mtk.dtb > Image.gz-dtb
