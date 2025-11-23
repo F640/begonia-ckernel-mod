@@ -6,7 +6,11 @@ This repo contains experimental patchsets to build [Power Kernel](https://github
 
 ## Difference beetween original kernel
 
-Power kernel: Added SukiSU, hide LineageOS patch removed.
+Power kernel: 
+- Added SukiSU
+- Enabled some kernel features
+- Has KVM
+- hide LineageOS patch removed
 
 ## Variants
 
@@ -30,4 +34,4 @@ Go to releases and get your favorite version, latest is preferred, after you got
 No guarantee will be added, but here's patches i will potentially add in future:
 - [Wireguard](https://github.com/WireGuard/wireguard-linux-compat)
 - [Baseband Guard](https://github.com/vc-teahouse/Baseband-guard)
-- susfs (sidex15's backport)
+- add backported susfs
