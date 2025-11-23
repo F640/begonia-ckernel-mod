@@ -94,7 +94,7 @@ jobs:
             if $ADD_KPM_BUILD; then
               (
               curl -o "$HOME/.local/bin/sukisu_kpimg" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/kpimg' && chmod +x "$HOME/.local/bin/sukisu_kpimg"
-              curl -o "$HOME/.local/bin/sukisu_kptools" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/kptools' && chmod +x "$HOME/.local/bin/sukisu_kptools
+              curl -o "$HOME/.local/bin/sukisu_kptools" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/kptools' && chmod +x "$HOME/.local/bin/sukisu_kptools"
               curl -o "$HOME/.local/bin/sukisu_kpm_patch" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/patch_linux' && chmod +x "$HOME/.local/bin/sukisu_kpm_patch"
               ) &
             fi
