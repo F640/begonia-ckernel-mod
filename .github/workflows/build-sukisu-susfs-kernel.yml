@@ -271,7 +271,7 @@ jobs:
           if  $ADD_KPM_BUILD; then
             mv begonia-ssu-kpm/Image.gz-dtb ak3-ssu-kpm/
             mv begonia-ssu-kpm-debug/Image.gz-dtb ak3-ssu-kpm-debug/
-          else
+
             (cd ak3-ssu-kpm && zip -r -9 ../sukisu-kpm-begonia-power-kernel-mod.zip . -x ".git/*") &
             (cd ak3-ssu-kpm-debug && zip -r -9 ../sukisu-kpm-debug-begonia-power-kernel-mod.zip . -x ".git/*") &
           fi
