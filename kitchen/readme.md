@@ -42,7 +42,7 @@ Run `plant-susfs-defconfig.sh` to add susfs-related entries. Also run `sussifyke
 
 Run `build.sh` to start building the kernel.
 
-Once done you will get 3 image files (TODO: add `boot.img` support): `Image`, `Image.gz`, `Image.gz-dtb`. Download Anykernel3 from [here](https://github.com/cvnertnc/AnyKernel3/), place `Image.gz-dtb` in Anykernel3 root folder then zip it. After this flash it to your device.
+Once done you will get 3 image files (TODO: add `boot.img` support): `Image`, `Image.gz`, `Image.gz-dtb`. Download Anykernel3 from [my AnyKernel3 KernelSU base](https://github.com/F640/AnyKernel3/tree/begonia-ksu-base), place `Image.gz-dtb` in Anykernel3 root folder then zip it. After this flash it to your device.
 
 ## shallow clone commit
 
