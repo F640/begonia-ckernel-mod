@@ -7,6 +7,7 @@ export DEV_DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
 declare -a enable_feature_flags=(
     # KVM
     "CONFIG_VIRTUALIZATION"
+    "CONFIG_ARM64_VHE"
 
     # VFIO
     "CONFIG_VFIO"
@@ -38,6 +39,3 @@ for CONFIG in "${add_enable_feature_flags[@]}"
 do
    echo "$CONFIG=y" >> $DEV_DEFCONFIG
 done
-
-# ARM virtualization support
-sed -ri "s/^(CONFIG_ARM64_VHE=.*|# CONFIG_ARM64_VHE is not set)/CONFIG_ARM64_VHE=1/" $DEV_DEFCONFIG
