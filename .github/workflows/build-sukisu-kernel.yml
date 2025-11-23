@@ -120,6 +120,9 @@ jobs:
           cd ${{ env.KERNEL_FOLDER }}
           ../kernel-scripts/set-features.sh
 
+          # add KVM support
+          ../kernel-scripts/enable-kvm-vfio.sh
+
           # remove built-in custom rom hiding (might will readd in future)
           patch -p1 < ../patches/96_unhide_stuff.patch
 
