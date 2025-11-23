@@ -10,6 +10,7 @@ declare -a enable_feature_flags=(
     # kernelsu and their kids requirements
     "CONFIG_KALLSYMS" 
     "CONFIG_KALLSYMS_ALL"
+    "CONFIG_KALLSYMS_BASE_RELATIVE"
     # If you plan to build with vanilla kernelsu (or any kernelsu fork) with manual hook that
     # isn't kprobes-tolerant you should  disable kprobes
     "CONFIG_KPROBES"

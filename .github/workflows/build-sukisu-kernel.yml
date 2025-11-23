@@ -31,8 +31,10 @@ permissions:
 
 env:
   KERNEL_FOLDER: 'kxm'
-  DEFCONFIG: 'arch/arm64/configs/begonia_user_defconfig' # relative to kernel folder
   SUKISU_BRANCH: 'nongki'
+  DEFCONFIG: 'arch/arm64/configs/begonia_user_defconfig' # relative to kernel folder
+  KERNEL_OUT_DIR: 'out/arch/arm64/boot/' # relative to kernel folder
+  DTB_OUT_DIR: '' # relative to kernel folder
 
 jobs:
   just-build-it:
