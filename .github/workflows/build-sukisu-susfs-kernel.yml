@@ -90,6 +90,15 @@ jobs:
 
             ../ext-scripts/sukisu-setup.sh ${{ env.SUKISU_BRANCH }} &
 
+            # configure KPM environment
+            if $ADD_KPM_BUILD; then
+              (
+              curl -o "$HOME/.local/bin/sukisu_kpimg" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/kpimg' && chmod +x "$HOME/.local/bin/sukisu_kpimg"
+              curl -o "$HOME/.local/bin/sukisu_kptools" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/kptools' && chmod +x "$HOME/.local/bin/sukisu_kptools
+              curl -o "$HOME/.local/bin/sukisu_kpm_patch" 'https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU_patch/refs/heads/main/kpm/patch_linux' && chmod +x "$HOME/.local/bin/sukisu_kpm_patch"
+              ) &
+            fi
+
             wait
 
       - name: save SukiSU commit # not using HEAD since we are not fetching latest one
@@ -187,6 +196,17 @@ jobs:
 
             if  ${{ github.event.inputs.mock_build == 'false' }}; then
               ../kernel-scripts/build.sh -b
+              # integrate KPM and rebuild kernel iamge
+              (
+              cd out/arch/arm64/boot
+              rm -rf Image.gz-dtb
+              sukisu_kpm_patch
+              # oImage is KPM-patched kernel image
+              rm -rf Image Image.gz
+              mv oImage Image
+              gzip -k -6 Image
+              cat Image.gz mtk.dtb > $file_output
+              )
             else
               echo "WARNING: Mock build enabled. Generating fake files instead..."
               mkdir -p out/arch/arm64/boot
@@ -207,6 +227,17 @@ jobs:
 
             if  ${{ github.event.inputs.mock_build == 'false' }}; then
               ../kernel-scripts/build.sh -b
+              # integrate KPM and rebuild kernel iamge
+              (
+              cd out/arch/arm64/boot
+              rm -rf Image.gz-dtb
+              sukisu_kpm_patch
+              # oImage is KPM-patched kernel image
+              rm -rf Image Image.gz
+              mv oImage Image
+              gzip -k -6 Image
+              cat Image.gz mtk.dtb > $file_output
+              )
             else
               echo "WARNING: Mock build enabled. Generating fake files instead..."
               mkdir -p out/arch/arm64/boot

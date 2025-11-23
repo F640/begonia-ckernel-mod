@@ -7,7 +7,7 @@ export DEV_DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
 export STOCK_DEFCONFIG="$PWD/arch/arm64/configs/stock_defconfig"
 
 declare -a enable_feature_flags=(
-    # kernelsu and their kids requirements
+    # KernelPatch like APatch and their kids requirements
     "CONFIG_KALLSYMS" 
     "CONFIG_KALLSYMS_ALL"
     "CONFIG_KALLSYMS_BASE_RELATIVE"
