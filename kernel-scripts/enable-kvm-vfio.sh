@@ -15,8 +15,9 @@ declare -a enable_feature_flags=(
 
     # Might slow down or causing problems with
     # system, but makes KVM support better
-    "CONFIG_TRANSPARENT_HUGEPAGE"
-    "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE"
+    # (whoops, seems to break compile)
+    # "CONFIG_TRANSPARENT_HUGEPAGE"
+    # "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE"
 
     # Misc
     "CONFIG_ARM64_VA_BITS_48"
