@@ -44,7 +44,7 @@ declare -a add_enable_feature_flags=(
 
     # VirtIO
     "CONFIG_VIRTIO"
-    "CONFIG_VIRTIO_BALLOON"
+    # "CONFIG_VIRTIO_BALLOON"
     "CONFIG_VHOST_NET"
     "CONFIG_VHOST_CROSS_ENDIAN_LEGACY"
 
@@ -52,7 +52,6 @@ declare -a add_enable_feature_flags=(
     # only available on Android 13 and above
     # CONFIG_VSOCKETS
     # CONFIG_VHOST_VSOCK
-    # CONFIG_VHOST_CROSS_ENDIAN_LEGACY
 )
 
 # enable features logic
