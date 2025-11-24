@@ -8,6 +8,7 @@ declare -a enable_feature_flags=(
     # General virtualization
     "CONFIG_VIRTUALIZATION"
     "CONFIG_ARM64_VHE"
+    "CONFIG_ARM_GIC_V3"
 
     # VFIO
     "CONFIG_VFIO"
@@ -20,9 +21,8 @@ declare -a enable_feature_flags=(
     # "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE"
 
     # Misc
-    # "CONFIG_ARM64_VA_BITS_48"
+    # "CONFIG_ARM64_VA_BITS_48" # breaks system
     "CONFIG_CMA"
-    "CONFIG_ARM_GIC_V3"
 )
 
 declare -a add_enable_feature_flags=(
