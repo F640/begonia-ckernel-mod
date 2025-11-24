@@ -12,6 +12,16 @@ declare -a enable_feature_flags=(
     # VFIO
     "CONFIG_VFIO"
     "CONFIG_IOMMU_SUPPORT"
+
+    # Might slow down or causing problems with
+    # system, but makes KVM support better
+    "CONFIG_TRANSPARENT_HUGEPAGE"
+    "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE"
+
+    # Misc
+    "CONFIG_ARM64_VA_BITS_48"
+    "CONFIG_CMA"
+    "CONFIG_ARM_GIC_V3"
 )
 
 declare -a add_enable_feature_flags=(
@@ -19,6 +29,8 @@ declare -a add_enable_feature_flags=(
     "CONFIG_KVM"
     "CONFIG_KVM_ARM_HOST"
     "CONFIG_KVM_MMIO"
+    "CONFIG_HAVE_KVM_IRQCHIP"
+    "CONFIG_HAVE_KVM_IRQ_ROUTING"
 
     # VFIO
     "CONFIG_VFIO_CCW"
@@ -28,6 +40,18 @@ declare -a add_enable_feature_flags=(
     "CONFIG_VFIO_MDEV_DEVICE"
     "CONFIG_S390_CCW_IOMMU"
     "CONFIG_S390_AP_IOMMU"
+
+    # VirtIO
+    "CONFIG_VIRTIO"
+    "CONFIG_VIRTIO_BALLOON"
+    "CONFIG_VHOST_NET"
+    "CONFIG_VHOST_CROSS_ENDIAN_LEGACY"
+
+    # potentially AVF-related options which
+    # only available on Android 13 and above
+    # CONFIG_VSOCKETS
+    # CONFIG_VHOST_VSOCK
+    # CONFIG_VHOST_CROSS_ENDIAN_LEGACY
 )
 
 # enable features logic
