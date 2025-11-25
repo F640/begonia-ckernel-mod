@@ -15,7 +15,7 @@ on:
       add_kpm_build:
         type: boolean
         default: false
-        description: Add KPM build (not stable atm)
+        description: Add KPM build (CONFIG_DEBUG_KERNEL must disabled)
       enable_config_debug_kernel:
         type: boolean
         default: false

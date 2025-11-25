@@ -38,7 +38,7 @@ declare -a add_enable_feature_flags=(
 declare -a disable_feature_flags=(
 )
 
-# Disable CONFIG_DEBUG_KERNEL to make KPM more stable?
+# SukiSU KPM does not work with CONFIG_DEBUG_KERNEL enabled
 if [ "$ENABLE_CONFIG_DEBUG_KERNEL" = "false" ]; then
    disable_feature_flags+=('CONFIG_DEBUG_KERNEL')
 fi
