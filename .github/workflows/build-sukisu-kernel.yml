@@ -16,6 +16,10 @@ on:
         type: boolean
         default: false
         description: Add KPM build (not stable atm)
+      enable_config_debug_kernel:
+        type: boolean
+        default: false
+        description: Enable CONFIG_DEBUG_KERNEL
       generate_release:
         type: choice
         description: Generate release? You will need to enable 2FA after you create release
@@ -43,6 +47,7 @@ jobs:
       - name: put input to variables
         run: |
           echo "ADD_KPM_BUILD=${{ github.event.inputs.add_kpm_build }}" >> $GITHUB_ENV
+          echo "ENABLE_CONFIG_DEBUG_KERNEL=${{ github.event.inputs.enable_config_debug_kernel }}" >> $GITHUB_ENV
 
       - name: Add date
         run: echo "TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV

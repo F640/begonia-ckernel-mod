@@ -5,6 +5,7 @@
 set -e
 export DEV_DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
 export STOCK_DEFCONFIG="$PWD/arch/arm64/configs/stock_defconfig"
+export ENABLE_CONFIG_DEBUG_KERNEL="${ENABLE_CONFIG_DEBUG_KERNEL:-false}"
 
 declare -a enable_feature_flags=(
     # KernelPatch like APatch and their kids requirements
@@ -36,6 +37,11 @@ declare -a add_enable_feature_flags=(
 
 declare -a disable_feature_flags=(
 )
+
+# Disable CONFIG_DEBUG_KERNEL to make KPM more stable?
+if [ "$ENABLE_CONFIG_DEBUG_KERNEL" = "false" ]; then
+   disable_feature_flags+=('CONFIG_DEBUG_KERNEL')
+fi
 
 declare -a add_disable_feature_flags=(
 )
