@@ -9,13 +9,13 @@ This repo contains experimental patchsets to build [Power Kernel](https://github
 Power kernel: 
 - Added SukiSU
 - Enabled some kernel features
-- Has KVM
+- Has KVM (Limited, no ARM64 Windows support)
 - hide LineageOS patch removed
 
 ## Variants
 
 - SukiSU
-- Sukisu with KPM (very unstable atm)
+- Sukisu with KPM (not very stable yet)
 
 and their debug variants
 
@@ -34,4 +34,4 @@ Go to releases and get your favorite version, latest is preferred, after you got
 No guarantee will be added, but here's patches i will potentially add in future:
 - [Wireguard](https://github.com/WireGuard/wireguard-linux-compat)
 - [Baseband Guard](https://github.com/vc-teahouse/Baseband-guard)
-- add backported susfs
+- Backported susfs
