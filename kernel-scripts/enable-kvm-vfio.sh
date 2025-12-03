@@ -7,7 +7,7 @@ export DEV_DEFCONFIG="$PWD/arch/arm64/configs/begonia_user_defconfig"
 declare -a enable_feature_flags=(
     # General virtualization
     "CONFIG_VIRTUALIZATION"
-    "CONFIG_ARM64_VHE"
+    # "CONFIG_ARM64_VHE"
     "CONFIG_ARM_GIC_V3"
 
     # VFIO

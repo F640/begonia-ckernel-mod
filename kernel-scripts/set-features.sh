@@ -27,6 +27,8 @@ declare -a enable_feature_flags=(
     "CONFIG_MODULES"
     "CONFIG_MODULE_UNLOAD"
     "CONFIG_MODVERSIONS"
+    # ARM virtualization
+    "CONFIG_ARM64_VHE"
 )
 
 declare -a add_enable_feature_flags=(
