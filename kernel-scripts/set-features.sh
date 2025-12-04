@@ -19,9 +19,9 @@ declare -a enable_feature_flags=(
     "CONFIG_KPROBES"
     # "CONFIG_HAVE_KPROBES" # overidding this option and other CONFIG_HAVE_* options is somewhat not a good practice
     # same goes for this one
-    # "CONFIG_HAVE_KRETPROBES" # not problematic, reason to disable this same as other CONFIG_HAVE_*
+    # "CONFIG_HAVE_KRETPROBES" # not problematic, reason to not overide this same as other CONFIG_HAVE_*
     # Tracepoint for KernelSU and its forks just in case
-    # CONFIG_HAVE_SYSCALL_TRACEPOINTS # reason to disable this same as other CONFIG_HAVE_*
+    # CONFIG_HAVE_SYSCALL_TRACEPOINTS # reason to not overide this same as other CONFIG_HAVE_*
     "CONFIG_FTRACE"
     "CONFIG_TRACEPOINTS"
     # mountify requirements if you need it
