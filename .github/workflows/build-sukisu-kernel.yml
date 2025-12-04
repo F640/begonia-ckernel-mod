@@ -337,7 +337,7 @@ jobs:
         if: ${{ github.event.inputs.upload_artifact == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: 'sukisu-kpm-begonia-power-kernel-src'
+          name: 'sukisu-begonia-power-kernel-src'
           path: 'sukisu-begonia-power-kernel-src.tar.gz'
           if-no-files-found: error
           compression-level: 9
