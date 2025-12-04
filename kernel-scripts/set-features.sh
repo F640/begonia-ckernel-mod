@@ -17,11 +17,11 @@ declare -a enable_feature_flags=(
     # If your kernel have problem with kprobes
     # you should disable kprobes and kretprobes
     "CONFIG_KPROBES"
-    "CONFIG_HAVE_KPROBES"
+    # "CONFIG_HAVE_KPROBES" # overidding this option and other CONFIG_HAVE_* options is somewhat not a good practice
     # same goes for this one
-    "CONFIG_HAVE_KRETPROBES"
+    # "CONFIG_HAVE_KRETPROBES" # not problematic, reason to disable this same as other CONFIG_HAVE_*
     # Tracepoint for KernelSU and its forks just in case (needs krpobes)
-    # CONFIG_HAVE_SYSCALL_TRACEPOINTS
+    # CONFIG_HAVE_SYSCALL_TRACEPOINTS # reason to disable this same as other CONFIG_HAVE_*
     "CONFIG_FTRACE"
     "CONFIG_TRACEPOINTS"
     # mountify requirements if you need it
