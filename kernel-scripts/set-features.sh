@@ -12,12 +12,18 @@ declare -a enable_feature_flags=(
     "CONFIG_KALLSYMS" 
     "CONFIG_KALLSYMS_ALL"
     "CONFIG_KALLSYMS_BASE_RELATIVE"
+    # general tracing option for kprobes and tracepoint
+    "CONFIG_TRACING"
     # If your kernel have problem with kprobes
     # you should disable kprobes and kretprobes
     "CONFIG_KPROBES"
     "CONFIG_HAVE_KPROBES"
     # same goes for this one
     "CONFIG_HAVE_KRETPROBES"
+    # Tracepoint for KernelSU and its forks just in case (needs krpobes)
+    # CONFIG_HAVE_SYSCALL_TRACEPOINTS
+    "CONFIG_FTRACE"
+    "CONFIG_TRACEPOINTS"
     # mountify requirements if you need it
     "CONFIG_OVERLAY_FS"
     "CONFIG_TMPFS_XATTR"
@@ -29,8 +35,6 @@ declare -a enable_feature_flags=(
     "CONFIG_MODVERSIONS"
     # ARM virtualization
     "CONFIG_ARM64_VHE"
-    # Just a helpful kernel feature for KernelSU and its forks
-    "CONFIG_HAVE_SYSCALL_TRACEPOINTS"
 )
 
 declare -a add_enable_feature_flags=(
