@@ -35,7 +35,7 @@ permissions:
 
 env:
   KERNEL_FOLDER: 'kxm'
-  SUKISU_BRANCH: 'nongki'
+  SUKISU_BRANCH: 'builtin'
   DEFCONFIG: 'arch/arm64/configs/begonia_user_defconfig' # relative to kernel folder
   KERNEL_OUT_DIR: 'out/arch/arm64/boot/' # relative to kernel folder
   DTB_OUT_DIR: '' # relative to kernel folder
@@ -75,7 +75,7 @@ jobs:
           ref: 'begonia-ksu-base'
           path: 'ak3'
 
-      - name: Setup kernel build stuffs, Neutron Clang and SukiSU (nongki)
+      - name: Setup kernel build stuffs, Neutron Clang and SukiSU (builtin)
         run: |
             set -e
             chmod -R 755 ./
