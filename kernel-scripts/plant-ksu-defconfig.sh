@@ -16,7 +16,7 @@ declare -a add_feature_flags=(
     "CONFIG_KPM"
 
     # hook choice, pick only one (check your kconfig for best method)
-    "KSU_NONE_HOOK" # only enable this if you have susfs 2.0.0+
+    "CONFIG_KSU_NONE_HOOK" # only enable this if you have susfs 2.0.0+
     # "KSU_SYSCALL_HOOK" # should not be used in < 5.10
     "CONFIG_KSU_MANUAL_HOOK"
 
