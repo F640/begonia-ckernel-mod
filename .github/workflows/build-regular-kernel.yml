@@ -1,0 +1,221 @@
+name: Build Regular Kernel
+run-name: Build da vanilla kernel
+# this version is only meant for use with magisk and apatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      mock_build:
+        type: boolean
+        default: false
+        description: Only create fake image file (mock build)
+      upload_artifact:
+        type: boolean
+        default: false
+        description: Upload built AnyKernel3 folder to artifact
+      enable_config_debug_kernel:
+        type: boolean
+        default: false
+        description: Enable CONFIG_DEBUG_KERNEL
+      integrate_wireguard:
+        type: boolean
+        default: true
+        description: Enable Wireguard
+      generate_release:
+        type: choice
+        description: Generate release? You will need to enable 2FA after you create release
+        default: none # More info about mandatory 2FA 🥀: https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
+        options:
+          - none
+          - pre-release
+          - release
+        required: true
+      release_message:
+        type: string
+        default: ''
+        required: false
+        description: Release/actions message
+
+permissions:
+  contents: write
+
+env:
+  KERNEL_FOLDER: 'kxm'
+  DEFCONFIG: 'arch/arm64/configs/begonia_user_defconfig' # relative to kernel folder
+  KERNEL_OUT_DIR: 'out/arch/arm64/boot/' # relative to kernel folder
+  WIREGUARD_BRANCH: 'v1.0.20220627'
+  DTB_OUT_DIR: '' # relative to kernel folder
+
+jobs:
+  just-build-it:
+    runs-on: ubuntu-latest
+    steps:
+      - name: put input to variables
+        run: |
+          echo "ENABLE_CONFIG_DEBUG_KERNEL=${{ github.event.inputs.enable_config_debug_kernel }}" >> $GITHUB_ENV
+          echo "INTEGRATE_WIREGUARD=${{ github.event.inputs.integrate_wireguard }}" >> $GITHUB_ENV
+
+      - name: Add date
+        run: echo "TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+
+      - name: checkout this repo
+        uses: actions/checkout@v5
+
+      - name: checkout kernel repo
+        uses: actions/checkout@v5
+        with:
+          repository: 'Saikrishna1504/kernel_xiaomi_mt6785' # use bka branch
+          ref: 'b689ceb2c9c978acfe23b2e486aeb82e929105f2' # last good commit
+          path: ${{ env.KERNEL_FOLDER }}
+
+      - name: save kernel commit # not using HEAD since we are not fetching latest one
+        run: |
+          cd ${{ env.KERNEL_FOLDER }}
+          echo "Kernel commit: $(git rev-parse FETCH_HEAD)"
+          echo "KERNEL_COMMIT=$(git rev-parse FETCH_HEAD)" >> $GITHUB_ENV
+
+      - name: checkout modified AnyKernel3 repo
+        uses: actions/checkout@v5
+        with:
+          repository: 'F640/AnyKernel3' # use begonia-ksu-base branch
+          ref: 'begonia-ksu-base'
+          path: 'ak3'
+
+      - name: Setup kernel build stuffs and Neutron Clang
+        run: |
+            set -e
+            chmod -R 755 ./
+
+            # Create $HOME/.local/bin folder
+            # GH Actions seemed to not create this folder by default
+            mkdir -p $HOME/.local/bin
+
+            cd ${{ env.KERNEL_FOLDER }}
+
+            (sudo apt update
+             sudo apt install -y git device-tree-compiler lz4 xz-utils zlib1g-dev openjdk-17-jdk gcc g++ python3 python-is-python3 p7zip-full android-sdk-libsparse-utils erofs-utils \
+             default-jdk gnupg flex bison gperf build-essential zip curl libc6-dev libncurses-dev libx11-dev libreadline-dev libgl1 libgl1-mesa-dev \
+             python3 make gcc g++ bc grep tofrodos python3-markdown libxml2-utils xsltproc zlib1g-dev python-is-python3 libc6-dev libtinfo6 \
+             make repo cpio kmod openssl libelf-dev pahole libssl-dev libarchive-tools zstd rsync pigz --fix-missing) &
+
+            if  ${{ github.event.inputs.mock_build == 'false' }}; then
+              (# mkdir -p "toolchain" && cd "toolchain"
+              mkdir -p $HOME/neutron-clang && cd $HOME/neutron-clang
+              curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
+              chmod +x antman && ./antman -S
+              ln -s $HOME/neutron-clang $GITHUB_WORKSPACE/${{ env.KERNEL_FOLDER }}/toolchain) &
+            fi
+
+            wait
+
+      - name: Integrate Wireguard
+        if: ${{ github.env.INTEGRATE_WIREGUARD == 'true' }}
+        run: |
+          cd ${{ env.KERNEL_FOLDER }}
+          git clone -b ${{ github.env.WIREGUARD_BRANCH }} --depth 1 https://github.com/WireGuard/wireguard-linux-compat wireguard
+          ./wireguard/kernel-tree-scripts/create-patch.sh | patch -p1
+          ./wireguard/kernel-tree-scripts/jury-rig.sh .
+          ../kernel-scripts/enable-wireguard.sh
+
+      - name: Fiddle kernel stuff
+        run: |
+          set -e
+          cd ${{ env.KERNEL_FOLDER }}
+          ../kernel-scripts/set-features.sh
+
+          # add KVM support
+          ../kernel-scripts/enable-kvm-vfio.sh
+
+          # remove built-in custom rom hiding (might will readd in future)
+          patch -p1 < ../patches/96_unhide_stuff.patch
+
+      - name: Start building
+        run: |
+            set -e
+            cd ${{ env.KERNEL_FOLDER }}
+
+            if  ${{ github.event.inputs.mock_build == 'false' }}; then
+              ../kernel-scripts/build.sh -b
+            else
+              echo "WARNING: Mock build enabled. Generating fake files instead..."
+              mkdir -p out/arch/arm64/boot
+              touch out/arch/arm64/boot/Image.gz-dtb
+            fi
+
+            cd ..
+            mkdir -p begonia
+            cp ${{ env.KERNEL_FOLDER }}/out/arch/arm64/boot/Image.gz-dtb begonia/
+
+      - name: Create AnyKernel3 zip installer
+        run: |
+          set -e
+          cp ak3 ak3-begonia
+
+          mv begonia/Image.gz-dtb ak3-begonia/
+
+          (cd ak3-begonia && zip -r -9 ../begonia-power-kernel-mod.zip . -x ".git/*")
+
+      - name: Upload AnyKernel3 zip to artifact
+        if: ${{ github.event.inputs.upload_artifact == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'begonia-power-kernel'
+          path: |
+              ak3-begonia/*
+              !ak3-begonia/.git/*
+          if-no-files-found: error
+          compression-level: 9
+
+      - name: Create commit text for record for artifact
+        if: ${{ github.event.inputs.upload_artifact == 'true' }}
+        run: |
+          echo "${{ env.KERNEL_COMMIT }}" >> ${{ env.KERNEL_FOLDER }}/commit.txt
+
+      - name: Pack kernel source
+        if : ${{ (github.event.inputs.upload_artifact == 'true') || (github.event.inputs.generate_release != 'none') }}
+        run: |
+            tar --use-compress-program="pigz -k -9" \
+              --exclude=".git"\
+              --exclude="out" \
+              -cvf sukisu-begonia-power-kernel-src.tar.gz  \
+              -C "${{ env.KERNEL_FOLDER }}" .
+
+      - name: Pack kernel output (for reference only)
+        if : ${{ (github.event.inputs.upload_artifact == 'true') || (github.event.inputs.generate_release != 'none') }}
+        run: |
+            tar --use-compress-program="pigz -k -9" \
+              -cvf begonia-power-kernel-src-out.tar.gz  \
+              -C "${{ env.KERNEL_FOLDER }}/out" .
+  
+      - name: Upload kernel source to artifact
+        if: ${{ github.event.inputs.upload_artifact == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'begonia-power-kernel-src'
+          path: 'begonia-power-kernel-src.tar.gz'
+          if-no-files-found: error
+          compression-level: 9
+          include-hidden-files: false
+
+      - name: Upload kernel source output to artifact (for reference only)
+        if: ${{ github.event.inputs.upload_artifact == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'begonia-power-kernel-src-out'
+          path: 'begonia-power-kernel-src-out.tar.gz'
+          if-no-files-found: error
+          compression-level: 9
+          include-hidden-files: false
+
+      - name: Create release
+        if: ${{ github.event.inputs.generate_release != 'none' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ github.event.inputs.generate_release == 'pre-release' }}
+          tag_name: ${{ env.TAG }}
+          files: |
+            begonia-power-kernel-mod.zip
+            begonia-power-kernel-mod-src.zip
+          body: |
+            Power Kernel commit: `${{ env.KERNEL_COMMIT }}`
+            ${{ github.event.inputs.release_message }}
