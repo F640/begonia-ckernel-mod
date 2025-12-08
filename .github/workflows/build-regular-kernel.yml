@@ -177,6 +177,7 @@ jobs:
             tar --use-compress-program="pigz -k -9" \
               --exclude=".git"\
               --exclude="out" \
+              --exclude="toolchain" \
               -cvf begonia-power-kernel-src.tar.gz  \
               -C "${{ env.KERNEL_FOLDER }}" .
 

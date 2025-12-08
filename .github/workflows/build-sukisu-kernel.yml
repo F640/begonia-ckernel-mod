@@ -343,6 +343,7 @@ jobs:
               --exclude=".git"\
               --exclude="KernelSU/.git" \
               --exclude="out" \
+              --exclude="toolchain" \
               -cvf sukisu-begonia-power-kernel-src.tar.gz  \
               -C "${{ env.KERNEL_FOLDER }}" .
 
