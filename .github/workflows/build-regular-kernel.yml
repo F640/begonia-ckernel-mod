@@ -64,7 +64,7 @@ jobs:
       - name: checkout kernel repo
         uses: actions/checkout@v5
         with:
-          repository: 'F640/kernel_xiaomi_mt6785_begonia' # use bka-preslmk branch
+          repository: 'F640/kernel_xiaomi_mt6785_begonia_power_kernel' # use bka-preslmk branch
           ref: 'bka-preslmk'
           path: ${{ env.KERNEL_FOLDER }}
 
