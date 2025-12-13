@@ -15,10 +15,10 @@ on:
       add_kpm_build:
         type: boolean
         default: false
-        description: Add KPM build (CONFIG_DEBUG_KERNEL must disabled)
+        description: Add KPM build
       enable_config_debug_kernel:
         type: boolean
-        default: false
+        default: true
         description: Enable CONFIG_DEBUG_KERNEL
       integrate_wireguard:
         type: boolean

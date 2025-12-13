@@ -15,7 +15,7 @@ on:
         description: Upload built AnyKernel3 folder to artifact
       enable_config_debug_kernel:
         type: boolean
-        default: false
+        default: true
         description: Enable CONFIG_DEBUG_KERNEL
       integrate_wireguard:
         type: boolean
