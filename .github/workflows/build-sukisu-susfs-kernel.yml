@@ -24,6 +24,10 @@ on:
         type: boolean
         default: true
         description: Enable Wireguard
+      kernel_build_time:
+        type: string
+        default: '2025-02-20 00:00:00 UTC'
+        description: Set kernel Build Time
       generate_release:
         type: choice
         description: Generate release? You will need to enable 2FA after you create release
@@ -60,6 +64,7 @@ jobs:
           echo "ADD_KPM_BUILD=${{ github.event.inputs.add_kpm_build }}" >> $GITHUB_ENV
           echo "ENABLE_CONFIG_DEBUG_KERNEL=${{ github.event.inputs.enable_config_debug_kernel }}" >> $GITHUB_ENV
           echo "INTEGRATE_WIREGUARD=${{ github.event.inputs.integrate_wireguard }}" >> $GITHUB_ENV
+          echo "KERNEL_BUILD_TIME=${{ github.event.inputs.kernel_build_time }}" >> $GITHUB_ENV
 
       - name: Add date
         run: echo "TAG=$(date +%Y%m%d%H%M%S)-sus" >> $GITHUB_ENV
