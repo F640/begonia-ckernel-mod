@@ -12,6 +12,7 @@ declare -a enable_feature_flags=(
     "CONFIG_KALLSYMS" 
     "CONFIG_KALLSYMS_ALL"
     "CONFIG_KALLSYMS_BASE_RELATIVE"
+
     # general tracing option for kprobes and tracepoint
     "CONFIG_TRACING"
     # If your kernel have problem with kprobes
@@ -24,15 +25,18 @@ declare -a enable_feature_flags=(
     # CONFIG_HAVE_SYSCALL_TRACEPOINTS # reason to not overide this same as other CONFIG_HAVE_*
     "CONFIG_FTRACE"
     "CONFIG_TRACEPOINTS"
+
     # mountify requirements if you need it
     "CONFIG_OVERLAY_FS"
     "CONFIG_TMPFS_XATTR"
     # this might be helpful one day
     "CONFIG_TMPFS_POSIX_ACL"
+
     # lkm support
     "CONFIG_MODULES"
     "CONFIG_MODULE_UNLOAD"
     "CONFIG_MODVERSIONS"
+
     # ARM virtualization
     "CONFIG_ARM64_VHE"
 )
