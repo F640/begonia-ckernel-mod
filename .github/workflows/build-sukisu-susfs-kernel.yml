@@ -158,6 +158,8 @@ jobs:
           # remove built-in custom rom hiding (might will readd in future)
           patch -p1 < ../patches/96_unhide_stuff.patch
 
+          # remove built-in custom rom hiding (might will readd in future)
+          patch -p1 < ../patches/revert_pri_disp_fps.patch
 
           # Complete path_umount backport
           patch -p1 < ../patches/complete_path_umount_backport.patch
