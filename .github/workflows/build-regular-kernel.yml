@@ -23,7 +23,7 @@ on:
         description: Enable Wireguard
       kernel_build_time:
         type: string
-        default: '2025-02-20 00:00:00 UTC'
+        default: 'Thu Jan 11 12:00:00 AM UTC 2024'
         description: Set kernel Build Time
       generate_release:
         type: choice
