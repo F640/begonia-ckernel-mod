@@ -10,7 +10,7 @@ AK3_DIR="$KERNEL_PATH/Anykernel"
 DEFCONFIG="${2:-begonia_user_defconfig}"
 BUILD_USER=$(whoami)
 BUILD_HOST=$(cat /etc/hostname)
-FAKE_BUILD_TIME="$KERNEL_BUILD_TIME"
+FAKE_BUILD_TIME="${KERNEL_BUILD_TIME:-$(date)}"
 TOOLCHAIN_DIR="$KERNEL_PATH/toolchain"
 OUT_DIR="$KERNEL_PATH/out"
 
