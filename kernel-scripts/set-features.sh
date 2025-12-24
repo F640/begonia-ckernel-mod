@@ -88,8 +88,12 @@ do
    echo "# $CONFIG is not set" >> $STOCK_DEFCONFIG
 done
 
+
+# increase dmesg buffer size
 sed -ri 's/^(CONFIG_LOG_BUF_SHIFT=.*|# CONFIG_LOG_BUF_SHIFT is not set)/CONFIG_LOG_BUF_SHIFT=17/' $DEV_DEFCONFIG
 sed -ri 's/^(CONFIG_LOG_BUF_SHIFT=.*|# CONFIG_LOG_BUF_SHIFT is not set)/CONFIG_LOG_BUF_SHIFT=17/' $STOCK_DEFCONFIG
+sed -ri 's/^(CONFIG_LOG_CPU_MAX_BUF_SHIFT=.*|# CONFIG_LOG_CPU_MAX_BUF_SHIFT is not set)/CONFIG_LOG_CPU_MAX_BUF_SHIFT=17/' $DEV_DEFCONFIG
+sed -ri 's/^(CONFIG_LOG_CPU_MAX_BUF_SHIFT=.*|# CONFIG_LOG_CPU_MAX_BUF_SHIFT is not set)/CONFIG_LOG_CPU_MAX_BUF_SHIFT=17/' $STOCK_DEFCONFIG
 
 # edit kernel suffix for evade play integrity detection (Disabled as kernel version now harcoded through kernel makefile for better evasion)
 # sed -ri 's/^(CONFIG_LOCALVERSION=.*|# CONFIG_LOCALVERSION is not set)/CONFIG_LOCALVERSION="-PooWeR"/' $DEV_DEFCONFIG
